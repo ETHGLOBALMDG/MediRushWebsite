@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
-import '../styles/verification.css';
+import '../styles/doctorVerification.css';
 
-const Verification = () => {
+const DoctorVerification = () => {
   const [formData, setFormData] = useState({
     licenseNumber: '',
     specialty: '',
@@ -164,4 +164,4 @@ const Verification = () => {
   );
 };
 
-export default Verification;
+export default DoctorVerification;
