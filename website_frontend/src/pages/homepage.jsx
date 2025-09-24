@@ -5,9 +5,11 @@ import StepsSection from '../components/StepsSection';
 import '../styles/App.css';
 
 const HomePage = () => (
-  <div className="main-bg">
-    <Navbar />
-    <HeroSection />
+  <div className="homepage">
+    <div className="homepage-header">
+      <Navbar />
+      <HeroSection />
+    </div>
     <BenefitsSection />
     <StepsSection />
   </div>
