@@ -1,0 +1,483 @@
+.patient-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #EAFFF9 0%, #DBEAE6 100%);
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+.patient-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 42px;
+}
+
+.patient-header {
+  padding: 47px 0 20px 0;
+}
+
+.patient-title {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #258A54;
+  margin: 0;
+  line-height: normal;
+}
+
+.patient-content {
+  display: flex;
+  gap: 74px;
+  align-items: flex-start;
+}
+
+.main-content {
+  flex: 1;
+  max-width: 982px;
+}
+
+.tab-navigation {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.tab-navigation::after {
+  content: '';
+  position: absolute;
+  bottom: -24px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.tab-btn {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: #000;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-right: 52px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  line-height: normal;
+}
+
+.tab-btn.active {
+  color: #258A54;
+}
+
+.tab-btn:hover {
+  color: #258A54;
+}
+
+.update-record-btn {
+  background: #82C385;
+  border: 1px solid #9DEEA1;
+  border-radius: 10px;
+  color: #FFF;
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 10px 28px;
+  cursor: pointer;
+  margin-left: auto;
+  transition: background 0.3s ease;
+  line-height: normal;
+}
+
+.update-record-btn:hover {
+  background: #6fb672;
+}
+
+.ai-assistant-content {
+  margin-top: 39px;
+}
+
+.ai-section-header {
+  margin-bottom: 80px;
+}
+
+.ai-title {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #258A54;
+  margin: 0 0 14px 0;
+  line-height: normal;
+}
+
+.ai-description {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.8);
+  margin: 0;
+  line-height: 137%;
+  max-width: 940px;
+}
+
+.ai-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ai-card {
+  background: #FFF;
+  border: 1px solid #4CAF50;
+  border-radius: 15px;
+  padding: 17px 61px 17px 61px;
+  width: 940px;
+  min-height: 194px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 37px;
+  margin-bottom: 26px;
+}
+
+.card-icon {
+  width: 26px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #007C05;
+  margin: 0;
+  line-height: 137%;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+.diagnosis-item,
+.test-item,
+.interaction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 39px;
+}
+
+.item-indicator {
+  width: 39px;
+  height: 1px;
+  background: #000;
+  margin-top: 13px;
+  flex-shrink: 0;
+}
+
+.item-content {
+  flex: 1;
+}
+
+.item-title {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 3px 0;
+  line-height: 137%;
+}
+
+.item-description {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: 137%;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 37px;
+  width: 393px;
+  flex-shrink: 0;
+}
+
+.sidebar-card {
+  background: #FFF;
+  border: 1px solid #4CAF50;
+  border-radius: 15px;
+  padding: 26px 38px;
+}
+
+.patient-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 251px;
+  justify-content: center;
+}
+
+.profile-avatar {
+  margin-bottom: 16px;
+}
+
+.profile-name {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 8px 0;
+  line-height: normal;
+}
+
+.profile-id {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: normal;
+}
+
+.patient-details {
+  height: 339px;
+}
+
+.details-title {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 35px 0;
+  line-height: 137%;
+}
+
+.details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid #000;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+  line-height: 137%;
+}
+
+.detail-value {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #000;
+  line-height: 137%;
+}
+
+.recent-appointments {
+  height: 251px;
+}
+
+.appointments-title {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 35px 0;
+  line-height: 137%;
+}
+
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.appointment-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.appointment-icon {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.calendar-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+}
+
+.appointment-details {
+  flex: 1;
+}
+
+.appointment-date {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 2px 0;
+  line-height: 137%;
+}
+
+.appointment-type {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  line-height: 137%;
+}
+
+/* Responsive Design */
+@media (max-width: 1440px) {
+  .patient-container {
+    padding: 0 20px;
+  }
+  
+  .patient-content {
+    gap: 40px;
+  }
+  
+  .ai-card {
+    width: 100%;
+    max-width: 940px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .patient-content {
+    flex-direction: column;
+    gap: 40px;
+  }
+  
+  .sidebar {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .sidebar-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-container {
+    padding: 0 15px;
+  }
+  
+  .patient-title {
+    font-size: 32px;
+  }
+  
+  .tab-navigation {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .tab-btn {
+    margin-right: 0;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .update-record-btn {
+    margin-left: 0;
+    align-self: center;
+  }
+  
+  .ai-card {
+    padding: 20px;
+  }
+  
+  .card-header {
+    gap: 20px;
+  }
+  
+  .diagnosis-item,
+  .test-item,
+  .interaction-item {
+    gap: 20px;
+  }
+  
+  .item-indicator {
+    width: 20px;
+    margin-top: 10px;
+  }
+  
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    gap: 20px;
+    overflow-x: auto;
+  }
+  
+  .sidebar-card {
+    min-width: 300px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-title {
+    font-size: 24px;
+  }
+  
+  .ai-title {
+    font-size: 24px;
+  }
+  
+  .ai-description {
+    font-size: 14px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+  }
+  
+  .item-title {
+    font-size: 18px;
+  }
+  
+  .sidebar {
+    flex-direction: column;
+  }
+  
+  .sidebar-card {
+    min-width: auto;
+  }
+}
