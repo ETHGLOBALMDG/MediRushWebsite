@@ -120,6 +120,33 @@ const DoctorVerification = () => {
 
           <div className="upload-section">
             <h2 className="section-title">Upload Documents</h2>
+            <p className="section-subtitle">Please upload a clear copy of your ID document (PDF: Aadhar, PAN, Driving License, etc.).</p>
+
+            <div 
+              className={`upload-area ${dragActive ? 'drag-active' : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              <div className="upload-icon">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <path d="M40 10C29.7 10 21.6 17.825 20.4675 27.8125C18.2896 28.1648 16.2473 29.0987 14.5562 30.5157C12.8651 31.9326 11.5881 33.7799 10.86 35.8625C4.71 37.635 0 43.12 0 50C0 58.31 6.69 65 15 65H65C73.31 65 80 58.31 80 50C80 45.6 77.8625 41.66 74.765 38.905C74.185 30.12 67.1775 23.11 58.36 22.655C55.35 15.3325 48.445 10 40 10ZM40 15C46.905 15 52.425 19.425 54.375 25.7L54.925 27.5H57.5C64.3875 27.5 70 33.1125 70 40V41.25L71.015 42.0325C72.24 42.9713 73.2354 44.1766 73.9258 45.557C74.6162 46.9373 74.9835 48.4567 75 50C75 55.69 70.69 60 65 60H15C9.31 60 5 55.69 5 50C5 44.95 8.625 41.03 13.2 40.235L14.8425 39.9225L15.155 38.2775C15.905 34.91 18.89 32.5 22.5 32.5H25V30C25 21.575 31.575 15 40 15ZM40 28.985L38.2 30.7025L28.2 40.7025L31.8 44.3025L37.5 38.5925V55H42.5V38.5925L48.2 44.2975L51.8 40.6975L41.8 30.6975L40 28.985Z" fill="black"/>
+                </svg>
+              </div>
+              <div className="upload-text">
+                <span className="upload-bold">Upload a file</span> or drag and drop PNG, JPG, PDF up to 10MB
+              </div>
+              <input
+                type="file"
+                className="file-input"
+                accept=".png,.jpg,.jpeg,.pdf"
+                onChange={handleFileUpload}
+              />
+            </div>
+            
+            <div className="divider"></div>
+
             <p className="section-subtitle">Please upload a clear copy of your medical license and any relevant certifications.</p>
 
             <div 
@@ -143,7 +170,7 @@ const DoctorVerification = () => {
                 accept=".png,.jpg,.jpeg,.pdf"
                 onChange={handleFileUpload}
               />
-            </div>
+              </div>
           </div>
 
           <div className="form-actions">
