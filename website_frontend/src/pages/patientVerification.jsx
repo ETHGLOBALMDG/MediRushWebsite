@@ -8,8 +8,8 @@ const PatientVerification = () => {
   const [formData, setFormData] = useState({
     name: '',
     dateOfBirth: '',
-    email: '',
     contactNumber: '',
+    bloodGroup : '',
     knownAllergies: '',
     chronicConditions: ''
   });
@@ -98,9 +98,14 @@ const PatientVerification = () => {
       email: '',
       contactNumber: '',
       knownAllergies: '',
-      chronicConditions: ''
+      chronicConditions: '',
+      bloodGroup: ''
     });
   };
+
+  // const   
+
+
 
   return (
     <div className="patient-verification-page">
@@ -123,9 +128,9 @@ const PatientVerification = () => {
         <div className="patient-form-container">
           <div className="personal-details-section">
             <h2 className="section-title">Personal Details</h2>
-            <p className="section-subtitle">This Information will be encrypted and stored securely</p>
+            {/* <p className="section-subtitle">This Information will be encrypted and stored securely</p> */}
 
-            <div className="form-grid">
+            <div >
               <div className="form-group">
                 <label className="form-label">Name</label>
                 <input
@@ -135,6 +140,7 @@ const PatientVerification = () => {
                   placeholder="eg. Dhruv"
                   value={formData.name}
                   onChange={handleInputChange}
+                  style={{'marginBottom':'15px'}}
                 />
               </div>
               
@@ -147,10 +153,11 @@ const PatientVerification = () => {
                   placeholder="mm/dd/yyyy"
                   value={formData.dateOfBirth}
                   onChange={handleInputChange}
+                  style={{'marginBottom':'15px'}}
                 />
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label className="form-label">Email Address</label>
                 <input
                   type="email"
@@ -160,7 +167,7 @@ const PatientVerification = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                 />
-              </div>
+              </div> */}
 
               <div className="form-group">
                 <label className="form-label">Contact Number</label>
@@ -180,14 +187,25 @@ const PatientVerification = () => {
 
           <div className="medical-history-section">
             <h2 className="section-title">Initial Medical History</h2>
-
+            <div className="form-group" style={{'marginBottom':'15px'}}>
+                <label className="form-label">Blood Group</label>
+                <input
+                  type="text"
+                  name="bloodGroup"
+                  className="form-input"
+                  placeholder="eg. A+"
+                  value={formData.bloodGroup}
+                  onChange={handleInputChange}
+                  style={{'marginBottom':'15px'}}
+                />
+              </div>
             <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Known Allergies</label>
                 <textarea
                   name="knownAllergies"
                   className="form-textarea"
-                  placeholder="eg. Penicillin"
+                  placeholder="eg. Penicillin, Peanuts"
                   value={formData.knownAllergies}
                   onChange={handleInputChange}
                 />
@@ -198,7 +216,7 @@ const PatientVerification = () => {
                 <textarea
                   name="chronicConditions"
                   className="form-textarea"
-                  placeholder="eg. Asthma"
+                  placeholder="eg. Asthma, Diabetes"
                   value={formData.chronicConditions}
                   onChange={handleInputChange}
                 />
@@ -246,12 +264,12 @@ const PatientVerification = () => {
             </div>
           )}
 
-          <div className="form-actions">
-            <button className="cancel-btn" onClick={handleCancel}>
+          <div className="form-actions" style={{'display':'flex','justifyContent':'center'}}>
+            <button id='cancel_button' className="cancel-btn" onClick={handleCancel}>
               Cancel
               </button>
             <button className="submit-btn" onClick={handleGenerateProof} disabled={isLoading || !selectedFile}>
-              <svg className="check-icon" width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <svg className="check-icon" width="18" height="18" viewBox="0 0 20 20" fill="green">
                 <path d="M12.8429 1.03526C13.1238 0.970706 13.4178 0.995206 13.6841 1.10536C13.9504 1.2155 14.1758 1.40584 14.329 1.64993L15.7081 3.85191C15.8193 4.02927 15.9692 4.17916 16.1466 4.29036L18.3486 5.66955C18.5932 5.82264 18.784 6.04818 18.8944 6.31477C19.0048 6.58137 19.0294 6.87576 18.9646 7.15697L18.3819 9.68779C18.3349 9.89233 18.3349 10.1049 18.3819 10.3094L18.9646 12.8416C19.0287 13.1224 19.0039 13.4162 18.8935 13.6822C18.7831 13.9483 18.5927 14.1733 18.3486 14.3263L16.1466 15.7068C15.9692 15.818 15.8193 15.9679 15.7081 16.1453L14.329 18.3473C14.176 18.5916 13.9506 18.7822 13.6843 18.8926C13.418 19.003 13.1239 19.0277 12.8429 18.9633L10.3107 18.3806C10.1066 18.3338 9.89459 18.3338 9.6905 18.3806L7.15828 18.9633C6.87728 19.0277 6.58319 19.003 6.31688 18.8926C6.05057 18.7822 5.82526 18.5916 5.67226 18.3473L4.29307 16.1453C4.18147 15.9678 4.03109 15.8179 3.85323 15.7068L1.65263 14.3276C1.40829 14.1746 1.21767 13.9493 1.10727 13.683C0.996866 13.4167 0.972156 13.1226 1.03657 12.8416L1.61794 10.3094C1.66495 10.1049 1.66495 9.89233 1.61794 9.68779L1.03519 7.15697C0.970589 6.87562 0.995352 6.58112 1.10603 6.31451C1.2167 6.0479 1.40777 5.82244 1.65263 5.66955L3.85323 4.29036C4.03109 4.17932 4.18147 4.02942 4.29307 3.85191L5.67226 1.64993C5.82537 1.4061 6.05053 1.21594 6.31654 1.10581C6.58256 0.995674 6.87624 0.971018 7.1569 1.03526L9.6905 1.61663C9.89459 1.66342 10.1066 1.66342 10.3107 1.61663L12.8429 1.03526Z" stroke="white" strokeWidth="1.5"/>
                  <path d="M6.55176 10.7425L9.37535 13.4467L13.4477 6.55078" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
