@@ -15,6 +15,19 @@
   align-items: center;
 }
 
+#cancel_button{
+  font-size: 21px;
+  border: solid #4CAF50 1px;
+  background-color: white;
+  color: black;
+}
+
+#cancel_button:hover{
+  background-color: #4CAF50 ;
+  /* background-color: white; */
+  border: solid #4CAF50  1px;
+  color: white;
+}
 .patient-verification-header {
   text-align: center;
   display: flex;
