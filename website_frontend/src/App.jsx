@@ -17,6 +17,17 @@ import LoadingPage_1 from './pages/loadingpage_1';
 const queryClient = new QueryClient()
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 5000); // 5 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingPage_1 />;
+  }
+
   return (
   <GlobalProvider>
     <WagmiProvider config={config}>
