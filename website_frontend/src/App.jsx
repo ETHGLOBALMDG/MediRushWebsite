@@ -19,20 +19,15 @@ const queryClient = new QueryClient()
 function App() {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 5000); // 5 seconds
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading) {
-    return <LoadingPage_1 />;
-  }
+  // This function will be called by HomePage when it's ready
+  const handleHomePageLoaded = () => setLoading(false);
 
   return (
   <GlobalProvider>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}> 
         <Router>
+          
           <Routes>
             <Route path="/" element={<HomePage/>} />
             <Route path="/doctor-verification" element={<DoctorVerification />} />
