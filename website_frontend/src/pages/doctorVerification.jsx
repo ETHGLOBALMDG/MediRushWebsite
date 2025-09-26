@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import '../styles/doctorVerification.css';
 import { generateZkProof } from '../api/zkpdfApi.js'; 
+import { sendDoctorProof } from '../api/sendDoctorProof.js';
 
 const DoctorVerification = () => {
   const [formData, setFormData] = useState({
@@ -75,6 +76,18 @@ const DoctorVerification = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (proof) {
+        sendDoctorProof(JSON.parse(proof))
+          .then((res) => {
+            console.log('Proof sent to backend:', res);
+          })
+          .catch((err) => {
+            console.error('Error sending proof to backend:', err);
+          });
+      }
+    }, [proof]);
 
   const handleDrag = (e) => {
     e.preventDefault();

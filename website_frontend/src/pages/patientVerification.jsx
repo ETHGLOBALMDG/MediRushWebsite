@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import '../styles/patientVerification.css';
-import { generateZkProof } from '../api/zkpdfApi.js'; 
-
+import {generateZkProof}  from '../api/zkpdfApi.js'; 
+import { sendPatientProof } from '../api/sendPatientProof.js';
 
 const PatientVerification = () => {
   const [formData, setFormData] = useState({
@@ -52,6 +52,18 @@ const PatientVerification = () => {
         setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (proof) {
+        sendPatientProof(JSON.parse(proof))
+          .then((res) => {
+            console.log('Proof sent to backend:', res);
+          })
+          .catch((err) => {
+            console.error('Error sending proof to backend:', err);
+          });
+    }
+  }, [proof]);
 
   const handleInputChange = (e) => {
     setFormData({
