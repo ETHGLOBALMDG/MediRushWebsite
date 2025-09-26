@@ -8,14 +8,14 @@ import { ConnectWallet } from './ConnectWallet';
 // import { useAccount } from 'wagmi';
 
 const Navbar = () => {
-  const location = useLocation();
-  const { registrationStatus } = useContext(GlobalContext);
-  const isNotRegistered = registrationStatus === 'not registered';
-  const isPatient = registrationStatus === 'patient';
-  // const [showWalletOptions, setShowWalletOptions] = useState(false);
-  // const {isConnected} = useAccount();
-  
-  // useEffect(()=>{setWalletConnected(true)},[isConnected,setWalletConnected]);
+  const location = useLocation();
+  const { registrationStatus } = useContext(GlobalContext);
+  const isNotRegistered = registrationStatus === 'not registered';
+  const isPatient = registrationStatus === 'patient';
+  // const [showWalletOptions, setShowWalletOptions] = useState(false);
+  // const {isConnected} = useAccount();
+  
+  // useEffect(()=>{setWalletConnected(true)},[isConnected,setWalletConnected]);
 
 
   return (
