@@ -3,11 +3,17 @@ import Navbar from '../components/Navbar.jsx';
 import '../styles/PatientVerification.css';
 import {generateZkAgeProof}  from '../api/zkAge.js'; 
 import { sendPatientProof } from '../api/sendPatientProof.js';
+import { ethers } from 'ethers';
+
+const contractABI = [{"inputs":[{"internalType":"address","name":"entropyAddress","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint64","name":"sequenceNumber","type":"uint64"},{"indexed":false,"internalType":"bytes32","name":"randomNumber","type":"bytes32"}],"name":"RandomNumberReceived","type":"event"},{"inputs":[{"internalType":"uint64","name":"sequence","type":"uint64"},{"internalType":"address","name":"provider","type":"address"},{"internalType":"bytes32","name":"randomNumber","type":"bytes32"}],"name":"_entropyCallback","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint64","name":"","type":"uint64"}],"name":"isRequestFulfilled","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint64","name":"","type":"uint64"}],"name":"receivedRandomNumber","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"requestRandomNumber","outputs":[],"stateMutability":"payable","type":"function"}];
+
+const CONTRACT_ADDRESS = "0x7eb0c3b54F82AD237aFE6b3E1024c013929a81c5";
+
+
 
 const PatientVerification = () => {
   const [formData, setFormData] = useState({
     name: '',
-    dateOfBirth: '',
     contactNumber: '',
     bloodGroup : '',
     knownAllergies: '',
@@ -19,11 +25,41 @@ const PatientVerification = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [proof, setProof] = useState(null);
   const [error, setError] = useState('');
+  const [randomNumber,setRandomNumber] = useState('');
+  const [idtext,setidtext] = useState('Generate your ID');
+  const [isTransactionPending,setisTransactionPending] = useState(false);
+  const [contract, setContract] = useState(null);
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [account,setAccount] = useState(null);  
+
+    // Key generation and registration logic
+  const [salt, setSalt] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
+  const [idRegistered, setIdRegistered] = useState(false);
+  const [idGenerated, setIdGenerated] = useState(false);
+  const [keyReady, setKeyReady] = useState(false);
+
+  const WS_URL =import.meta.env.VITE_WS_URL;
+  let wsProvider, wsContract;
+  if (typeof window !== "undefined") {
+    wsProvider = new ethers.WebSocketProvider(WS_URL);
+    wsContract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, wsProvider);
+    wsContract.on('RandomNumberReceived', (sequenceNumber, randomNumber) => {
+      setRandomNumber(randomNumber.toString());
+      setIdGenerated(true);
+      setidtext("Patient ID generated. Enter a unique salt to create your key.");
+      setSalt('');
+      setPrivateKey('');
+      setKeyReady(false);
+      setIdRegistered(false);
+    });
+  }
 
   const handleFile = (file) => {
     if (file && file.type === "application/pdf") {
-        setSelectedFile(file);
-        console.log('File set:', file);
+      setSelectedFile(file);
+      console.log('File set:', file);
         setFileName(file.name);
         setError(''); // Clear previous errors
         setProof(null); // Clear previous proof
@@ -32,6 +68,50 @@ const PatientVerification = () => {
         setError("Please upload a valid PDF file.");
     }
   };
+
+  const hashIdWithSalt = async (id, salt) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(id + salt);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  };
+    // --- Register ID and key in localStorage ---
+  const handleRegister = () => {
+    if (!randomNumber || !privateKey || !salt) {
+      setError("ID and key must be generated before registration.");
+      return;
+    }
+    localStorage.setItem('patient_id', randomNumber);
+    localStorage.setItem('patient_key', privateKey);
+    setIdRegistered(true);
+    setError('');
+  };
+
+  useEffect(() => {
+      const initializeEthers = async () => {
+        if (typeof window.ethereum !== 'undefined') {
+          try {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const web3Provider = new ethers.BrowserProvider(window.ethereum);
+            const web3Signer = await web3Provider.getSigner();
+            const userAccount = await web3Signer.getAddress();
+            const contractInstance = new ethers.Contract(CONTRACT_ADDRESS, contractABI, web3Signer);
+            setProvider(web3Provider);
+            setSigner(web3Signer);
+            setContract(contractInstance);
+            setAccount(userAccount);
+          } catch (error) {
+            console.error('Error initializing ethers:', error);
+            setError('Failed to connect to wallet. Please make sure MetaMask is installed and connected.');
+          }
+        } else {
+          setError('MetaMask not detected. Please install MetaMask to use this feature.');
+        }
+      };
+      initializeEthers();
+    }, []);
+
+
 
   const handleGenerateProof = async () => {
     if (!selectedFile) {
@@ -106,9 +186,6 @@ const PatientVerification = () => {
   const handleCancel = () => {
     setFormData({
       name: '',
-      dateOfBirth: '',
-      email: '',
-      contactNumber: '',
       knownAllergies: '',
       chronicConditions: '',
       bloodGroup: ''
@@ -117,6 +194,35 @@ const PatientVerification = () => {
 
   // const   
 
+  async function generateRandomId() {
+    if (!contract || isTransactionPending || idGenerated) return;
+    setisTransactionPending(true);
+    setError('');
+    setidtext("Waiting for blockchain to generate your ID...");
+    try {
+      const tx = await contract.requestRandomNumber({ value: ethers.parseEther("0.01") });
+      await tx.wait();
+      setisTransactionPending(false);
+      // The event will set randomNumber and flags
+    } catch (err) {
+      console.log(err)
+      setError("Failed to generate ID. Please try again.");
+      setisTransactionPending(false);
+      setidtext("Generate your ID");
+    }
+  }
+
+    const handleSaltChange = async (e) => {
+    const value = e.target.value;
+    setSalt(value);
+    setPrivateKey('');
+    setKeyReady(false);
+    if (randomNumber && value) {
+      const key = await hashIdWithSalt(randomNumber, value);
+      setPrivateKey(key);
+      setKeyReady(true);
+    }
+  };
 
 
   return (
@@ -156,7 +262,7 @@ const PatientVerification = () => {
                 />
               </div>
               
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label className="form-label">Date of Birth</label>
                 <input
                   type="text"
@@ -167,7 +273,7 @@ const PatientVerification = () => {
                   onChange={handleInputChange}
                   style={{'marginBottom':'15px'}}
                 />
-              </div>
+              </div> */}
 
               {/* <div className="form-group">
                 <label className="form-label">Email Address</label>
@@ -288,6 +394,66 @@ const PatientVerification = () => {
               {isLoading ? 'Generating Proof...' : 'Generate ZK Proof'}
             </button>
           </div>
+          <div className='divider'></div>
+          
+                  <div className='id-generation-section'>
+          <h2 className="section-title">Generate your ID</h2>
+          <p className="section-subtitle">Your ID, Your Identity</p>
+          <div className="form-group">
+            <input
+              type="text"
+              style={{width: '100%', marginBottom: '20px'}}
+              className="form-input"
+              value={randomNumber || ''}
+              readOnly
+              placeholder={idtext}
+            />
+          </div>
+          <button
+            className="submit-btn"
+            onClick={generateRandomId}
+            disabled={isLoading || isTransactionPending || idGenerated || !contract}
+          >
+            {isTransactionPending ? 'Processing Transaction...' : 'Generate Patient ID'}
+          </button>
+        </div>
+          <div className='divider'></div>
+       <div className='key-generation-section'>
+          <h2 className="section-title">Generate & Store Your Key</h2>
+          <p className="section-subtitle">Enter a unique salt to generate your private key. Remember your salt!</p>
+          <div className="form-group">
+            <input
+              style={{width: '100%', marginBottom: '20px'}}
+              type="text"
+              className="form-input"
+              placeholder="Enter your unique salt"
+              value={salt}
+              onChange={handleSaltChange}
+              disabled={!idGenerated || idRegistered}
+            />
+          </div>
+          <div className='divider'></div>
+          <div style={{display:'flex',justifyContent:'center'}}>
+
+          <button
+            className="submit-btn"
+            onClick={handleRegister}
+            disabled={!keyReady || idRegistered}
+            >
+            Register ID & Key
+          </button>
+          </div>
+          {privateKey && (
+            <div style={{ marginTop: '10px', wordBreak: 'break-all' }}>
+              <strong>Your Private Key:</strong>
+              <div style={{ fontSize: '0.95em', background: '#f5f5f5', padding: '8px', borderRadius: '4px' }}>
+                {privateKey}
+              </div>
+              {idRegistered && <div style={{ color: 'green', marginTop: '5px' }}>ID and Key stored in your browser.</div>}
+            </div>
+          )}
+        </div>
+
         </div>
       </div>
     </div>

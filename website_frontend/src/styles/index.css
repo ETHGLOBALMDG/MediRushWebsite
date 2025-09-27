@@ -13,6 +13,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+body::-webkit-scrollbar{
+  visibility: hidden;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

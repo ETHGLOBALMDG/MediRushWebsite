@@ -1,97 +1,146 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import '../styles/PatientHistory.css';
+import CryptoJS from "crypto-js"; // npm install crypto-js
+import axios from 'axios';
 
 const PatientHistory = () => {
-  const patientData = {
-    name: 'Dhruv Saxena',
-    id: '123456',
-    age: '25',
-    gender: 'Male',
-    bloodType: 'O+',
-    allergies: 'None'
-  };
+  const [activeTab, setActiveTab] = useState('ai-assistant');
+  const [patientData, setPatientData] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const allergies = [
+  const potentialDiagnoses = [
     {
-      name: 'Penicillin',
-      verifiedBy: 'Dr. Emily Carter',
-      date: 'Jan 10, 2022'
+      title: 'Possible Migraine',
+      description: 'Based on symptoms and medical history'
     },
     {
-      name: 'Latex',
-      verifiedBy: 'Dr. Emily Carter', 
-      date: 'Mar 05, 2021'
+      title: 'Tension Headache',
+      description: 'Consider further evaluation'
     }
   ];
 
-  const chronicConditions = [
+  const recommendedTests = [
     {
-      name: 'Asthma',
-      verifiedBy: 'Dr. Emily Carter',
-      date: 'Ongoing since 2015'
-    }
-  ];
-
-  const pastProcedures = [
-    {
-      name: 'Tonsillectomy',
-      verifiedBy: 'Dr. Sarah Jenkins',
-      date: 'Jul 22, 2019'
+      title: 'Neurological Examination',
+      description: 'To rule out other conditions'
     },
     {
-      name: 'Appendectomy',
-      verifiedBy: 'Dr. Johnathan Miles',
-      date: 'May 14, 2008'
+      title: 'Electroencephalogram (EEG)',
+      description: 'To assess brain activity'
     }
   ];
 
-  const appointments = [
+  const drugInteractions = [
     {
-      date: '24-09-2025',
-      type: 'Neurology Consultation'
+      title: 'Interaction between medication A and medication B',
+      description: 'May increase risk of side effects'
     },
     {
-      date: '24-09-2025',
-      type: 'Neurology Consultation'
+      title: 'Interaction between medication C and medication D',
+      description: 'Monitor closely for adverse reactions'
     }
   ];
+
+  useEffect(() => {
+    async function fetchAndDecryptPatientData() {
+      setLoading(true);
+      const patientId = localStorage.getItem("patientId");
+      const key = localStorage.getItem("key");
+      if (!patientId || !key) {
+        setLoading(false);
+        return;
+      }
+
+      // 1. Fetch blobId from Hedera contract
+      const blobId = await fetchBlobIDFromHedera(patientId);
+
+      // 2. Fetch encrypted blob data
+      const encryptedBlob = await fetchEncryptedBlob(blobId);
+
+      // 3. Decrypt using AES
+      let decrypted;
+      try {
+        const bytes = CryptoJS.AES.decrypt(encryptedBlob, key);
+        decrypted = bytes.toString(CryptoJS.enc.Utf8);
+      } catch (e) {
+        setLoading(false);
+        return;
+      }
+
+      // 4. Parse and set patient data
+      try {
+        const data = JSON.parse(decrypted);
+
+        setPatientData({
+          name: data.personalDetails?.name || '',
+          id: data.patientId || '',
+          age: data.personalDetails?.age || '',
+          gender: data.personalDetails?.gender || '',
+          bloodType: data.initialMedicalHistory?.bloodGroup || '',
+          allergies: data.initialMedicalHistory?.knownAllergies || ''
+        });
+
+        setAppointments(
+          (data.recentAppointments || []).map(appt => ({
+            date: appt.date,
+            type: appt.diagnosis || appt.type || ''
+          }))
+        );
+      } catch (e) {
+        setLoading(false);
+        return;
+      }
+      setLoading(false);
+    }
+
+    fetchAndDecryptPatientData();
+  }, []);
+
+  // Dummy implementations, replace with actual logic
+  async function fetchBlobIDFromHedera(patientId) {
+    const response = await axios("hhtp://localhost:5000/api/getBlobId", {patientId: patientId});
+    if(response.data.blobId){
+      return response.data.blobId;
+    }
+  }
+  async function fetchEncryptedBlob(blobId) {
+
+    // Fetch from your storage (IPFS, S3, etc.)
+    // return await fetch(blobId).then(res => res.text());
+    return "ENCRYPTED_BLOB_STRING";
+  }
 
   return (
     <div className="patient-history-page">
       <Navbar />
-      
-      <div className="patient-history-container">
-        <div className="patient-history-header">
-          <h1 className="patient-history-title">Patient: {patientData.name}</h1>
-          <button className="join-dao-btn">Join VeriMed DAO</button>
+      <div className="patient-container">
+        <div className="patient-header">
+          <h1 className="patient-title">
+            Patient: {loading ? "Loading..." : (patientData?.name || "Unknown")}
+          </h1>
         </div>
 
         <div className="patient-history-content">
           <div className="main-content">
-            <div className="medical-history-section">
-              <h2 className="medical-history-title">Medical History</h2>
-              <p className="medical-history-description">
-                A comprehensive and verified record of your health journey.
-              </p>
-
-              <div className="medical-history-cards">
-                <div className="medical-card allergies-card">
-                  <div className="card-header">
-                    <svg className="card-icon" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.75 7.5C13.75 6.8125 14.3125 6.25 15 6.25C15.6875 6.25 16.25 6.8125 16.25 7.5C16.25 8.1875 15.6875 8.75 15 8.75C14.3125 8.75 13.75 8.1875 13.75 7.5ZM10 11.25C10.6875 11.25 11.25 10.6875 11.25 10C11.25 9.3125 10.6875 8.75 10 8.75C9.3125 8.75 8.75 9.3125 8.75 10C8.75 10.6875 9.3125 11.25 10 11.25ZM7.5 6.25C7.5 5.5625 6.9375 5 6.25 5C5.5625 5 5 5.5625 5 6.25C5 6.9375 5.5625 7.5 6.25 7.5C6.9375 7.5 7.5 6.9375 7.5 6.25ZM11.25 5C11.9375 5 12.5 4.4375 12.5 3.75C12.5 3.0625 11.9375 2.5 11.25 2.5C10.5625 2.5 10 3.0625 10 3.75C10 4.4375 10.5625 5 11.25 5ZM18.75 5C19.4375 5 20 4.4375 20 3.75C20 3.0625 19.4375 2.5 18.75 2.5C18.0625 2.5 17.5 3.0625 17.5 3.75C17.5 4.4375 18.0625 5 18.75 5ZM23.75 5C23.0625 5 22.5 5.5625 22.5 6.25C22.5 6.9375 23.0625 7.5 23.75 7.5C24.4375 7.5 25 6.9375 25 6.25C25 5.5625 24.4375 5 23.75 5ZM18.75 10C18.75 10.6875 19.3125 11.25 20 11.25C20.6875 11.25 21.25 10.6875 21.25 10C21.25 9.3125 20.6875 8.75 20 8.75C19.3125 8.75 18.75 9.3125 18.75 10ZM23.125 16.3375C23.125 17.225 22.8 18.075 22.2625 18.75C22.7875 19.425 23.125 20.275 23.125 21.1625C23.125 23.325 21.3375 25.0875 19.175 25.0875L18.6375 25.05C18.05 26.4875 16.6375 27.5 15 27.5C13.3625 27.5 11.95 26.4875 11.3625 25.05L10.825 25.0875C8.65 25.0875 6.875 23.325 6.875 21.1625C6.875 20.275 7.2 19.425 7.7375 18.75C7.2125 18.075 6.875 17.225 6.875 16.3375C6.875 14.175 8.6625 12.4125 10.825 12.4125L11.3625 12.45C11.95 11.0125 13.3625 10 15 10C16.6375 10 18.05 11.0125 18.6375 12.45L19.175 12.4125C21.3375 12.4125 23.125 14.175 23.125 16.3375ZM9.375 16.3375C9.375 16.875 9.7125 17.375 10.2125 17.625L11.3125 18.125C11.4625 17.225 11.95 16.425 12.6375 15.8625L11.625 15.1625C11.4 15 11.125 14.9125 10.825 14.9125C10.0375 14.9125 9.375 15.55 9.375 16.3375ZM12.65 21.6375C11.95 21.075 11.4625 20.275 11.3125 19.375L10.2125 19.875C9.7125 20.125 9.375 20.625 9.375 21.15C9.375 21.9375 10.0375 22.575 10.825 22.575C11.1125 22.575 11.3875 22.5 11.6375 22.325L12.65 21.6375ZM16.425 23.625L16.2875 22.2625C15.8875 22.4125 15.45 22.5 15 22.5C14.55 22.5 14.125 22.4125 13.75 22.2625L13.575 23.625C13.6 24.375 14.225 25 15 25C15.775 25 16.4 24.375 16.425 23.625ZM16.425 13.875C16.4 13.125 15.775 12.5 15 12.5C14.225 12.5 13.6 13.125 13.575 13.875L13.75 15.2375C14.125 15.0875 14.55 15 15 15C15.45 15 15.8875 15.0875 16.2875 15.2375L16.425 13.875ZM20.625 21.15C20.625 20.625 20.2875 20.1 19.7875 19.8625L18.6875 19.3375C18.5375 20.2625 18.05 21.0625 17.3625 21.625L18.375 22.3375C18.6 22.5 18.875 22.5875 19.175 22.5875C19.9625 22.5875 20.625 21.95 20.625 21.15ZM20.625 16.3375C20.625 15.55 19.9625 14.9125 19.175 14.9125C18.8875 14.9125 18.6125 15 18.3625 15.1625L17.3375 15.8625C18.0375 16.425 18.525 17.225 18.675 18.125L19.775 17.625C20.2875 17.375 20.625 16.875 20.625 16.3375Z" fill="#007C05"/>
-                    </svg>
-                    <h3 className="card-title">Allergies</h3>
-                  </div>
-                  <div className="card-content">
-                    {allergies.map((allergy, index) => (
-                      <div key={index} className="medical-record-item">
-                        <div className="record-divider"></div>
-                        <div className="record-details">
-                          <h4 className="record-name">{allergy.name}</h4>
-                          <p className="record-verified">Verified by {allergy.verifiedBy}</p>
-                        </div>
-                        <span className="record-date">{allergy.date}</span>
+            <div className="tab-content">
+              {activeTab === 'ai-assistant' && (
+                <div className="ai-assistant-content">
+                  <div className="ai-cards-container">
+                    <div className="ai-card potential-diagnoses">
+                      <div className="card-header">
+                        <svg className="card-icon diagnoses-icon" width="26" height="21" viewBox="0 0 26 21" fill="none">
+                          <g clipPath="url(#clip0_143_1612)">
+                            <path d="M20.15 10.5C20.5075 10.5 20.8 10.2047 20.8 9.84375C20.8 9.48281 20.5075 9.1875 20.15 9.1875C19.7925 9.1875 19.5 9.48281 19.5 9.84375C19.5 10.2047 19.7925 10.5 20.15 10.5ZM13 7.21875C14.9703 7.21875 16.575 5.59863 16.575 3.60938C16.575 1.62012 14.9703 0 13 0C11.0297 0 9.425 1.62012 9.425 3.60938C9.425 5.59863 11.0297 7.21875 13 7.21875ZM2.42937 14.9297C2.84375 15.5572 3.61969 15.6598 4.17219 15.3316C4.83031 14.9379 6.45531 14.0314 8.45 13.3383V17.0625H17.55V13.3424C19.5447 14.0314 21.1697 14.942 21.8278 15.3357C22.3803 15.6639 23.1562 15.5531 23.5706 14.9338L24.2937 13.8387C24.6512 13.2973 24.6025 12.4195 23.8875 11.9889C23.4041 11.6977 22.6809 11.2916 21.8116 10.865C20.67 12.7559 17.7734 11.5951 18.2488 9.42539C16.6278 8.90859 14.8322 8.53125 13 8.53125C10.6844 8.53125 8.41344 9.12598 6.5 9.85195C6.49187 11.5008 4.56625 12.4482 3.2825 11.3285C2.8275 11.5746 2.41719 11.8043 2.11656 11.9848C1.40156 12.4154 1.35281 13.2891 1.71031 13.8346L2.42937 14.9297ZM14.95 14.1094C15.4903 14.1094 15.925 14.5482 15.925 15.0938C15.925 15.6393 15.4903 16.0781 14.95 16.0781C14.4097 16.0781 13.975 15.6393 13.975 15.0938C13.975 14.5482 14.4097 14.1094 14.95 14.1094ZM11.05 10.1719C11.5903 10.1719 12.025 10.6107 12.025 11.1562C12.025 11.7018 11.5903 12.1406 11.05 12.1406C10.5097 12.1406 10.075 11.7018 10.075 11.1562C10.075 10.6107 10.5097 10.1719 11.05 10.1719ZM4.55 10.5C4.9075 10.5 5.2 10.2047 5.2 9.84375C5.2 9.48281 4.9075 9.1875 4.55 9.1875C4.1925 9.1875 3.9 9.48281 3.9 9.84375C3.9 10.2047 4.1925 10.5 4.55 10.5ZM25.35 18.375H0.65C0.2925 18.375 0 18.6703 0 19.0312V20.3438C0 20.7047 0.2925 21 0.65 21H25.35C25.7075 21 26 20.7047 26 20.3438V19.0312C26 18.6703 25.7075 18.375 25.35 18.375Z" fill="#007C05"/>
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_143_1612">
+                              <rect width="26" height="21" fill="white"/>
+                            </clipPath>
+                          </defs>
+                        </svg>
+                        <h3 className="card-title">Potential Diagnoses</h3>
                       </div>
                     ))}
                   </div>
@@ -157,8 +206,8 @@ const PatientHistory = () => {
                   <circle cx="50" cy="50" r="50" fill="#D9D9D9"/>
                 </svg>
               </div>
-              <h3 className="profile-name">{patientData.name}</h3>
-              <p className="profile-id">Patient ID: {patientData.id}</p>
+              <h3 className="profile-name">{loading ? "Loading..." : (patientData?.name || "Unknown")}</h3>
+              <p className="profile-id">Patient ID: {loading ? "..." : (patientData?.id || "Unknown")}</p>
             </div>
 
             <div className="sidebar-card patient-details-card">
@@ -166,19 +215,19 @@ const PatientHistory = () => {
               <div className="details-list">
                 <div className="detail-item">
                   <span className="detail-label">Age</span>
-                  <span className="detail-value">{patientData.age}</span>
+                  <span className="detail-value">{loading ? "..." : (patientData?.age || "Unknown")}</span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Gender</span>
-                  <span className="detail-value">{patientData.gender}</span>
+                  <span className="detail-value">{loading ? "..." : (patientData?.gender || "Unknown")}</span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Blood Type</span>
-                  <span className="detail-value">{patientData.bloodType}</span>
+                  <span className="detail-value">{loading ? "..." : (patientData?.bloodType || "Unknown")}</span>
                 </div>
                 <div className="detail-item">
                   <span className="detail-label">Allergies</span>
-                  <span className="detail-value">{patientData.allergies}</span>
+                  <span className="detail-value">{loading ? "..." : (patientData?.allergies || "Unknown")}</span>
                 </div>
               </div>
             </div>
@@ -186,22 +235,26 @@ const PatientHistory = () => {
             <div className="sidebar-card recent-appointments-card">
               <h3 className="appointments-title">Recent Appointments</h3>
               <div className="appointments-list">
-                {appointments.map((appointment, index) => (
-                  <div key={index} className="appointment-item">
-                    <div className="appointment-icon">
-                      <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="25" cy="25" r="25" fill="#BBF7D0"/>
-                      </svg>
-                      <svg className="calendar-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 19H5V8H19M16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V5C21 4.46957 20.7893 3.96086 20.4142 3.58579C20.0391 3.21071 19.5304 3 19 3H18V1M17 12H12V17H17V12Z" fill="#4CAF50"/>
-                      </svg>
+                {loading ? (
+                  <div>Loading...</div>
+                ) : (
+                  appointments.map((appointment, index) => (
+                    <div key={index} className="appointment-item">
+                      <div className="appointment-icon">
+                        <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
+                          <circle cx="25" cy="25" r="25" fill="#BBF7D0"/>
+                        </svg>
+                        <svg className="calendar-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M19 19H5V8H19M16 1V3H8V1H6V3H5C3.89 3 3 3.89 3 5V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V5C21 4.46957 20.7893 3.96086 20.4142 3.58579C20.0391 3.21071 19.5304 3 19 3H18V1M17 12H12V17H17V12Z" fill="#4CAF50"/>
+                        </svg>
+                      </div>
+                      <div className="appointment-details">
+                        <div className="appointment-date">{appointment.date}</div>
+                        <div className="appointment-type">{appointment.type}</div>
+                      </div>
                     </div>
-                    <div className="appointment-details">
-                      <div className="appointment-date">{appointment.date}</div>
-                      <div className="appointment-type">{appointment.type}</div>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>
