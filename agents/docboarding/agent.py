@@ -60,7 +60,7 @@ def create_text_chat(text: str, end_session: bool = False) -> ChatMessage:
 
 async def callPDFagentLeg(pdf64):
     """Call PDF processing agent for document analysis"""
-    pdf_agent_addr = "agent1qgzcsqmx5e5jghfjklzzdwfg55ztexpq2336d7u04cwvwhmh5et0y6u3wrc"      
+    pdf_agent_addr = "agent1qfrcy30ygppepluky07c7g247jv9409zaul0kauex29qst8ldz0px3c4try"      
 
     prompt = """
 You are a document authenticity expert analyzing a medical registration certificate. Conduct a comprehensive forensic analysis to assess document legitimacy using the following criteria: 
@@ -175,93 +175,7 @@ async def query_handler(ctx: Context, sender: str, msg: VerRequest):
         ctx.logger.error(f"Error processing verification request: {e}")
         await ctx.send(sender, VerResponse(verified=False, confidence=0.0))
 
-# Chat protocol for interactive verification
-chat_proto = Protocol(spec=chat_protocol_spec)
-
-@chat_proto.on_message(ChatMessage)
-async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
-    """Handle incoming chat messages for interactive verification"""
-    ctx.storage.set(str(ctx.session), sender)
-    await ctx.send(
-        sender,
-        ChatAcknowledgement(timestamp=datetime.now(timezone.utc), acknowledged_msg_id=msg.msg_id),
-    )
-
-    for item in msg.content:
-        if isinstance(item, StartSessionContent):
-            ctx.logger.info(f"Got a start session message from {sender}")
-            welcome_msg = """
-**Document Verification Agent**
-
-Hello! I can help you verify medical registration certificates. 
-
-To use this service:
-1. Send me a base64-encoded PDF of a medical certificate
-2. I will analyze the document for authenticity
-3. Verify the registration with Indian medical councils
-4. Provide a verification result with confidence score
-
-Please send your base64-encoded PDF document.
-            """
-            await ctx.send(sender, create_text_chat(welcome_msg))
-            continue
-            
-        elif isinstance(item, TextContent):
-            user_input = item.text.strip()
-            ctx.logger.info(f"Got verification request from {sender}")
-            
-            try:
-                # Check if input looks like base64 PDF data
-                if user_input.startswith("JVBERi"):  # PDF magic bytes in base64
-                    # Process as PDF verification
-                    result = await process_verification(user_input)
-                    
-                    status = "✅ VERIFIED" if result.verified else "❌ NOT VERIFIED"
-                    confidence_pct = result.confidence * 100
-                    
-                    response_text = f"""
-**Document Verification Result**
-
-**Status:** {status}
-**Confidence Score:** {confidence_pct:.1f}%
-
-**Analysis:**
-- Document authenticity assessed using AI forensic analysis
-- Registration verified against Indian medical council databases
-- Confidence score based on document quality and verification results
-
-{'✅ This appears to be a legitimate medical certificate.' if result.verified else '⚠️ This document could not be verified or appears suspicious.'}
-                    """
-                    
-                    await ctx.send(sender, create_text_chat(response_text))
-                    
-                else:
-                    await ctx.send(sender, create_text_chat(
-                        "Please send a valid base64-encoded PDF document for verification. "
-                        "The input should start with PDF magic bytes (JVBERi in base64)."
-                    ))
-                    
-            except Exception as e:
-                ctx.logger.error(f"Error processing verification: {e}")
-                await ctx.send(
-                    sender, 
-                    create_text_chat("I apologize, but I encountered an error processing your document. Please try again with a valid base64-encoded PDF.")
-                )
-        else:
-            ctx.logger.info(f"Got unexpected content from {sender}")
-
-@chat_proto.on_message(ChatAcknowledgement)
-async def handle_ack(ctx: Context, sender: str, msg: ChatAcknowledgement):
-    """Handle chat acknowledgements"""
-    ctx.logger.info(f"Got an acknowledgement from {sender} for {msg.acknowledged_msg_id}")
-
-# Register the chat protocol
-agent.include(chat_proto, publish_manifest=True)
 
 if __name__ == "__main__":
-    print("Starting Document Verification Agent...")
-    print(f"Agent name: {agent.name}")
-    print(f"Agent address: {agent.address}")
-    print("Mailbox enabled - agent will be discoverable")
-    
+   
     agent.run()

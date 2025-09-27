@@ -23,7 +23,7 @@ load_dotenv()
 GEMINI_KEY = os.environ.get("GEMINI_KEY")
 
 # Initialize agent
-agent = Agent(name="Medical Rating Agent", port=8001, mailbox=True, publish_agent_details=True)
+agent = Agent(name="Doctor Reputation Agent", port=8001, mailbox=True, publish_agent_details=True)
 
 # Initialize Gemini LLM
 llm = ChatGoogleGenerativeAI(
@@ -37,7 +37,7 @@ class RatingRequest(Model):
     text: str
 
 class RatingResponse(Model):
-    rating: float
+    deltarating: float
 
 def extract_rating_from_text(text: str) -> float:
     """
@@ -76,16 +76,6 @@ def extract_rating_from_text(text: str) -> float:
         print(f"Error processing text with LLM: {e}")
         return None
 
-def create_text_chat(text: str, end_session: bool = False) -> ChatMessage:
-    """Create a text chat message."""
-    content = [TextContent(type="text", text=text)]
-    if end_session:
-        content.append(EndSessionContent(type="end-session"))
-    return ChatMessage(
-        timestamp=datetime.now(timezone.utc),
-        msg_id=uuid4(),
-        content=content,
-    )
 
 # Protocol setup
 chat_proto = Protocol(spec=chat_protocol_spec)
@@ -102,59 +92,14 @@ async def rating_query_handler(ctx: Context, sender: str, req: RatingRequest):
         ctx.logger.info(f"Generated rating: {rating}")
         
         # Send back the rating
-        await ctx.send(sender, RatingResponse(rating=rating))
+        # subtract 5 - so that rating can both increase and decrease.
+        await ctx.send(sender, RatingResponse(deltarating=rating-5))
         
     except Exception as e:
         ctx.logger.error(f"Error processing rating request: {e}")
         # Send back a default neutral rating on error
         await ctx.send(sender, RatingResponse(rating=5.0))
 
-@chat_proto.on_message(ChatMessage)
-async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
-    """Handle incoming chat messages for interactive rating."""
-    ctx.storage.set(str(ctx.session), sender)
-    await ctx.send(
-        sender,
-        ChatAcknowledgement(timestamp=datetime.now(timezone.utc), acknowledged_msg_id=msg.msg_id),
-    )
-
-    for item in msg.content:
-        if isinstance(item, StartSessionContent):
-            ctx.logger.info(f"Got a start session message from {sender}")
-            await ctx.send(sender, create_text_chat(
-                "Hello! Send me any text and I'll provide a numerical rating (0.0-10.0) based on its content."
-            ))
-            continue
-        elif isinstance(item, TextContent):
-            user_text = item.text.strip()
-            ctx.logger.info(f"Got text to rate from {sender}: {user_text}")
-            
-            try:
-                # Process the text and get rating
-                rating = extract_rating_from_text(user_text)
-                
-                # Format the response
-                response_text = f"**Rating Analysis**\n\nText: \"{user_text}\"\n\n**Rating: {rating:.1f}/10.0**"
-                
-                # Send the response back
-                await ctx.send(sender, create_text_chat(response_text))
-                
-            except Exception as e:
-                ctx.logger.error(f"Error processing text rating: {e}")
-                await ctx.send(
-                    sender, 
-                    create_text_chat("I apologize, but I encountered an error processing your text. Please try again.")
-                )
-        else:
-            ctx.logger.info(f"Got unexpected content from {sender}")
-
-@chat_proto.on_message(ChatAcknowledgement)
-async def handle_ack(ctx: Context, sender: str, msg: ChatAcknowledgement):
-    """Handle chat acknowledgements."""
-    ctx.logger.info(f"Got an acknowledgement from {sender} for {msg.acknowledged_msg_id}")
-
-# Register the protocol
-agent.include(chat_proto, publish_manifest=True)
 
 # Standalone function for direct usage
 def rate_text(text: str) -> float:
