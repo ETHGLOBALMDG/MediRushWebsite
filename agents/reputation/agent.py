@@ -1,0 +1,169 @@
+from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain.agents import initialize_agent, AgentType
+from uagents import Model, Context, Agent, Protocol
+from uagents_core.contrib.protocols.chat import (
+    ChatAcknowledgement,
+    ChatMessage,
+    EndSessionContent,
+    StartSessionContent,
+    TextContent,
+    chat_protocol_spec,
+)
+from datetime import datetime, timezone
+from uuid import uuid4
+# from typing import Any, Dict
+# import json
+import os
+from dotenv import load_dotenv
+import re
+
+# Load environment variables
+load_dotenv()
+
+GEMINI_KEY = os.environ.get("GEMINI_KEY")
+
+# Initialize agent
+agent = Agent(name="Medical Rating Agent", port=8001, mailbox=True, publish_agent_details=True)
+
+# Initialize Gemini LLM
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=GEMINI_KEY,
+    temperature=0.7
+)
+
+# Define request/response models
+class RatingRequest(Model):
+    text: str
+
+class RatingResponse(Model):
+    rating: float
+
+def extract_rating_from_text(text: str) -> float:
+    """
+    Process text input and return a floating point rating.
+    Uses Gemini LLM to analyze the text and extract/generate a numerical rating.
+    """
+    try:
+        # Create a prompt for the LLM to analyze the text and return a rating
+        rating_prompt = f"""
+        Analyze the following text, which is a review for a doctor by a patient, and provide a numerical rating between 0.0 and 10.0 based on the content.
+        Consider factors like sentiment, satisfaction, outcome, side effects, relevance, or any other appropriate metrics.
+        
+        Text to analyze: "{text}"
+        
+        Please respond with ONLY a single floating point number between 0.0 and 10.0, nothing else.
+        """
+        
+        # Get response from Gemini
+        response = llm.invoke(rating_prompt)
+        response_text = response.content.strip()
+        
+        # Extract floating point number from response
+        # Look for patterns like 7.5, 8.0, 9.2, etc.
+        rating_match = re.search(r'\b(\d+\.?\d*)\b', response_text)
+        
+        if rating_match:
+            rating = float(rating_match.group(1))
+            # Ensure rating is within bounds
+            rating = max(0.0, min(10.0, rating))
+            return rating
+        else:
+            # Fallback: analyze text length and basic sentiment
+            return None
+            
+    except Exception as e:
+        print(f"Error processing text with LLM: {e}")
+        return None
+
+def create_text_chat(text: str, end_session: bool = False) -> ChatMessage:
+    """Create a text chat message."""
+    content = [TextContent(type="text", text=text)]
+    if end_session:
+        content.append(EndSessionContent(type="end-session"))
+    return ChatMessage(
+        timestamp=datetime.now(timezone.utc),
+        msg_id=uuid4(),
+        content=content,
+    )
+
+# Protocol setup
+chat_proto = Protocol(spec=chat_protocol_spec)
+
+@agent.on_query(model=RatingRequest, replies={RatingResponse})
+async def rating_query_handler(ctx: Context, sender: str, req: RatingRequest):
+    """Handle rating requests - takes string input and returns float rating."""
+    try:
+        ctx.logger.info(f"Received rating request from {sender}: {req.text}")
+        
+        # Process the text and get rating
+        rating = extract_rating_from_text(req.text)
+        
+        ctx.logger.info(f"Generated rating: {rating}")
+        
+        # Send back the rating
+        await ctx.send(sender, RatingResponse(rating=rating))
+        
+    except Exception as e:
+        ctx.logger.error(f"Error processing rating request: {e}")
+        # Send back a default neutral rating on error
+        await ctx.send(sender, RatingResponse(rating=5.0))
+
+@chat_proto.on_message(ChatMessage)
+async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
+    """Handle incoming chat messages for interactive rating."""
+    ctx.storage.set(str(ctx.session), sender)
+    await ctx.send(
+        sender,
+        ChatAcknowledgement(timestamp=datetime.now(timezone.utc), acknowledged_msg_id=msg.msg_id),
+    )
+
+    for item in msg.content:
+        if isinstance(item, StartSessionContent):
+            ctx.logger.info(f"Got a start session message from {sender}")
+            await ctx.send(sender, create_text_chat(
+                "Hello! Send me any text and I'll provide a numerical rating (0.0-10.0) based on its content."
+            ))
+            continue
+        elif isinstance(item, TextContent):
+            user_text = item.text.strip()
+            ctx.logger.info(f"Got text to rate from {sender}: {user_text}")
+            
+            try:
+                # Process the text and get rating
+                rating = extract_rating_from_text(user_text)
+                
+                # Format the response
+                response_text = f"**Rating Analysis**\n\nText: \"{user_text}\"\n\n**Rating: {rating:.1f}/10.0**"
+                
+                # Send the response back
+                await ctx.send(sender, create_text_chat(response_text))
+                
+            except Exception as e:
+                ctx.logger.error(f"Error processing text rating: {e}")
+                await ctx.send(
+                    sender, 
+                    create_text_chat("I apologize, but I encountered an error processing your text. Please try again.")
+                )
+        else:
+            ctx.logger.info(f"Got unexpected content from {sender}")
+
+@chat_proto.on_message(ChatAcknowledgement)
+async def handle_ack(ctx: Context, sender: str, msg: ChatAcknowledgement):
+    """Handle chat acknowledgements."""
+    ctx.logger.info(f"Got an acknowledgement from {sender} for {msg.acknowledged_msg_id}")
+
+# Register the protocol
+agent.include(chat_proto, publish_manifest=True)
+
+# Standalone function for direct usage
+def rate_text(text: str) -> float:
+    """
+    Standalone function to rate text and return a float.
+    Can be used independently without the agent framework.
+    """
+    return extract_rating_from_text(text)
+
+if __name__ == "__main__":
+    # Example usage
+    agent.run()

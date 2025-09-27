@@ -1,0 +1,6 @@
+zkpdf
+.env
+.venv/*
+**/__pycache__/*
+private_keys.json
+agent*_data.json
