@@ -4,7 +4,7 @@ from uagents import Context, Model, Agent
 from hyperon import MeTTa
 
 # Import components from separate files
-from metta.medicalrag import MedicalRAG
+from metta.rag import MedicalRAG
 from metta.db import initialize_knowledge_graph
 from metta.utils import LLM, process_query
 
@@ -12,17 +12,17 @@ from metta.utils import LLM, process_query
 # Load environment variables
 load_dotenv()
 ASI_API_KEY=os.environ.get("ASI_ONE_API")
-SEED_PHRASE=os.environ.get("SEED_PHRASE")
+SEED_PHRASE=os.environ.get("SEED_PHRASE_1")
 
 # Initialize agent
 agent = Agent(
-    name="Doctor sahab", 
+    name="Treatment report analyser", 
     port=8002,
     seed=SEED_PHRASE,
     mailbox=True, 
     )
 
-class MedicalQuery(Model):
+class ReportUpload(Model):
     history: str
     symptoms: str
     diagnosis: str
@@ -36,8 +36,8 @@ rag = MedicalRAG(metta)
 llm = LLM(api_key=ASI_API_KEY)
 
 
-@agent.on_query(model=MedicalQuery)
-async def query_handler(ctx: Context, sender: str, qry: MedicalQuery): # by default request goes to /submit        
+@agent.on_query(model=ReportUpload)
+async def query_handler(ctx: Context, sender: str, qry: ReportUpload): # by default request goes to /submit        
     history = qry.history
     symptoms = qry.symptoms
     diagnosis = qry.diagnosis
@@ -50,6 +50,8 @@ async def query_handler(ctx: Context, sender: str, qry: MedicalQuery): # by defa
         response = process_query(history, symptoms, diagnosis, solution, side_effects, rag, llm)
     except:
         pass
+    
+    
 
 
 
