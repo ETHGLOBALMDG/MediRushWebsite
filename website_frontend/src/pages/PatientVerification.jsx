@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/PatientVerification.css';
-import {generateZkProof}  from '../api/zkpdfApi.js'; 
+import {generateZkAgeProof}  from '../api/zkAge.js'; 
 import { sendPatientProof } from '../api/sendPatientProof.js';
 
 const PatientVerification = () => {
@@ -44,7 +44,7 @@ const PatientVerification = () => {
     setProof(null);
 
     try {
-        const proofData = await generateZkProof(selectedFile);
+        const proofData = await generateZkAgeProof(selectedFile);
         setProof(JSON.stringify(proofData, null, 2)); // Store formatted JSON
     } catch (err) {
         setError(err.message);

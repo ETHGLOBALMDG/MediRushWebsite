@@ -1,7 +1,8 @@
 import React, { useState,useEffect } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import '../styles/DoctorVerification.css';
-import { generateZkProof } from '../api/zkpdfApi.js'; 
+import { generateZkNationalityProof } from '../api/zkNationality.js'; 
+import { generateZkMedicalLicenseProof } from '../api/zkMedicalLicense.js'; 
 import { sendDoctorProof } from '../api/sendDoctorProof.js';
 
 const DoctorVerification = () => {
@@ -61,8 +62,8 @@ const DoctorVerification = () => {
     try {
       // Generate proofs for both files concurrently
       const [medicalLicenseProofData, idProofData] = await Promise.all([
-        generateZkProof(medicalLicenseFile),
-        generateZkProof(idFile)
+        generateZkMedicalLicenseProof(medicalLicenseFile),
+        generateZkNationalityProof(idFile)
       ]);
       
       setProof({

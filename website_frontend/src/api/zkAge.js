@@ -30,7 +30,7 @@ const readFileAsByteArray = (file) => {
  * @returns {Promise<object>} The proof data from the API.
  * @throws {Error} If the API call fails.
  */
-export const generateZkProof = async (pdfFile, options = {}) => {
+export const generateZkAgeProof = async (pdfFile, options = {}) => {
   try {
     console.log('Reading PDF file into byte array...');
     const pdfBytes = await readFileAsByteArray(pdfFile);
@@ -38,9 +38,9 @@ export const generateZkProof = async (pdfFile, options = {}) => {
     // Construct the JSON body exactly as the server expects
     const proofBody = {
       pdf_bytes: pdfBytes,
-      page_number: options.pageNumber || 0,
-      offset: options.offset || 0,
-      sub_string: options.subString || "Sample Signed PDF Document",
+      page_number:0,
+      offset:0,
+      sub_string: options.subString || "LMV", 
     };
 
     console.log('Sending JSON payload to prover service...');
