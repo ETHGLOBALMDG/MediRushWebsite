@@ -10,3 +10,4 @@ def initialize_knowledge_graph(metta: MeTTa):
     metta.space().add_atom(E(S("disease"), S("diabetes+viral"), ValueAtom("paracetamol")))
     metta.space().add_atom(E(S("treatment"), S("paracetamol"), ValueAtom("sleepiness")))
     metta.space().add_atom(E(S("symptom"), S("diabetes+fever"), ValueAtom("diabetes+viral")))
+    metta.space().add_atom(E(S("symptom"), S("diabetes+fever"), ValueAtom("diabetes+viral")))

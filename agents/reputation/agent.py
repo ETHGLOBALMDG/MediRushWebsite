@@ -52,7 +52,7 @@ def extract_rating_from_text(text: str) -> float:
         
         Text to analyze: "{text}"
         
-        Please respond with ONLY a single floating point number between 0.0 and 10.0, nothing else.
+        Please respond with ONLY a single int point number between 0 and 50, nothing else.
         """
         
         # Get response from Gemini
@@ -66,7 +66,7 @@ def extract_rating_from_text(text: str) -> float:
         if rating_match:
             rating = float(rating_match.group(1))
             # Ensure rating is within bounds
-            rating = max(0.0, min(10.0, rating))
+            rating = max(0.0, min(50.0, rating))
             return rating
         else:
             # Fallback: analyze text length and basic sentiment
@@ -93,12 +93,12 @@ async def rating_query_handler(ctx: Context, sender: str, req: RatingRequest):
         
         # Send back the rating
         # subtract 5 - so that rating can both increase and decrease.
-        await ctx.send(sender, RatingResponse(deltarating=rating-5))
+        await ctx.send(sender, RatingResponse(deltarating=rating-25))
         
     except Exception as e:
         ctx.logger.error(f"Error processing rating request: {e}")
         # Send back a default neutral rating on error
-        await ctx.send(sender, RatingResponse(rating=5.0))
+        await ctx.send(sender, RatingResponse(rating=25))
 
 
 # Standalone function for direct usage

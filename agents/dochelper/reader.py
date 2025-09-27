@@ -215,7 +215,7 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
             
             try:
                 classification = classify_query(user_query, history)
-                print(classification)              
+                print(classification)
                 if classification["classification"] == "technical":
                     bot_response = generate_technical_response(user_query, ["context"])
 
