@@ -3,12 +3,25 @@ import Navbar from '../components/Navbar';
 import '../styles/PatientHistory.css';
 import CryptoJS from "crypto-js"; // npm install crypto-js
 import axios from 'axios';
+import { getFullnodeUrl, SuiClient } from '@mysten/sui/client';
+import { WalrusClient } from '@mysten/walrus';
+
 
 const PatientHistory = () => {
   const [activeTab, setActiveTab] = useState('ai-assistant');
   const [patientData, setPatientData] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const suiClient = new SuiClient({
+	  url: getFullnodeUrl('testnet'),
+  });
+
+
+  const walrusClient = new WalrusClient({
+    network: 'testnet',
+    suiClient,
+  });
 
   const potentialDiagnoses = [
     {
@@ -57,59 +70,61 @@ const PatientHistory = () => {
       const blobId = await fetchBlobIDFromHedera(patientId);
 
       // 2. Fetch encrypted blob data
-      const encryptedBlob = await fetchEncryptedBlob(blobId);
-
-      // 3. Decrypt using AES
-      let decrypted;
-      try {
-        const bytes = CryptoJS.AES.decrypt(encryptedBlob, key);
-        decrypted = bytes.toString(CryptoJS.enc.Utf8);
-      } catch (e) {
-        setLoading(false);
-        return;
-      }
-
-      // 4. Parse and set patient data
-      try {
-        const data = JSON.parse(decrypted);
-
-        setPatientData({
-          name: data.personalDetails?.name || '',
-          id: data.patientId || '',
-          age: data.personalDetails?.age || '',
-          gender: data.personalDetails?.gender || '',
-          bloodType: data.initialMedicalHistory?.bloodGroup || '',
-          allergies: data.initialMedicalHistory?.knownAllergies || ''
-        });
-
-        setAppointments(
-          (data.recentAppointments || []).map(appt => ({
-            date: appt.date,
-            type: appt.diagnosis || appt.type || ''
-          }))
-        );
-      } catch (e) {
-        setLoading(false);
-        return;
-      }
-      setLoading(false);
+      const encryptedBlob = await getAndDecryptBlob(blobId);
+      setPatientData(encryptedBlob);
     }
+
 
     fetchAndDecryptPatientData();
   }, []);
 
   // Dummy implementations, replace with actual logic
   async function fetchBlobIDFromHedera(patientId) {
-    const response = await axios("hhtp://localhost:5000/api/getBlobId", {patientId: patientId});
+    const response = await axios("http://localhost:5000/api/getBlobId", {patientId: patientId});
     if(response.data.blobId){
       return response.data.blobId;
     }
   }
-  async function fetchEncryptedBlob(blobId) {
+/**
+ * Fetches encrypted data as raw bytes, converts to a string, and decrypts to JSON.
+ * @param {string} blobId - The identifier for the blob to fetch.
+ * @returns {Promise<object|null>} A promise resolving to the decrypted JSON object or null on failure.
+ */
+  async function getAndDecryptBlob(blobId) {
+    try {
+      // 1. Get the secret key from local storage.
+      const secretKey = localStorage.getItem('private key');
+      if (!secretKey) {
+        throw new Error("Decryption key not found in local storage.");
+      }
 
-    // Fetch from your storage (IPFS, S3, etc.)
-    // return await fetch(blobId).then(res => res.text());
-    return "ENCRYPTED_BLOB_STRING";
+      // 2. Fetch the raw encrypted data (as an ArrayBuffer).
+      const encryptedArrayBuffer = await walrusClient.readBlob({ blobId });
+      if (!encryptedArrayBuffer || encryptedArrayBuffer.byteLength === 0) {
+        throw new Error("Fetched encrypted data is empty or invalid.");
+      }
+
+      // 3. 💡 Convert the raw bytes (Uint8Array) to a string.
+      // The fetched bytes represent the Base64 string that CryptoJS created.
+      // We use TextDecoder to convert these bytes back into that string.
+      const encryptedBase64String = new TextDecoder().decode(encryptedArrayBuffer);
+
+      // 4. Decrypt the Base64 string using the key.
+      const decryptedBytes = CryptoJS.AES.decrypt(encryptedBase64String, secretKey);
+
+      // 5. Convert the decrypted bytes into the original JSON string (UTF-8).
+      const decryptedJsonString = decryptedBytes.toString(CryptoJS.enc.Utf8);
+      if (!decryptedJsonString) {
+        throw new Error("Decryption failed. Key may be incorrect or data corrupted.");
+      }
+
+      // 6. Parse the JSON string back into an object and return.
+      return JSON.parse(decryptedJsonString);
+
+    } catch (error) {
+      console.error("An error occurred during the decryption process:", error);
+      return null;
+    }
   }
 
   return (

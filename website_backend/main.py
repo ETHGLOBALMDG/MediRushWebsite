@@ -84,11 +84,20 @@ CONTRACT_ADDRESS = "0x7b52C2a7075fc8F7DF4AEAd4f8d8277A8e35838F"
 with open("DoctorContractABI.json") as f:  
     CONTRACT_ABI = json.load(f)
 
+with open("Patients.json") as f:  
+    PATIENTS_CONTRACT_ABI = json.load(f)
+
+
+PATIENTS_CONTRACT_ADDRESS = "0x7b52C2a7075fc8F7DF4AEAd4f8d8277A8e35838F"
+
 WEB3_PROVIDER = "https://testnet.hashio.io/api"  
 PRIVATE_KEY = os.environ.get("PRIVATE_KEY")      
 
 w3 = Web3(Web3.HTTPProvider(WEB3_PROVIDER))
 contract = w3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
+
+patient_contract = w3.eth.contract(address=PATIENTS_CONTRACT_ADDRESS,abi=PATIENTS_CONTRACT_ABI)
+
 OWNER_ADDRESS = w3.eth.account.from_key(PRIVATE_KEY).address
 
 @app.route('/api/doctors/uploadCertificate', methods=['POST'])
@@ -306,4 +315,20 @@ def subtract_reputation():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+@app.route('api/getBlobId',methods=['POST'])
+def getBlobId():
+    try:
+        data = request.get_json()
+        patientId = data.get('patientId')
+        if not patientId:
+            return jsonify({"error": "patientId is required"}), 400
+        # --- Web3.py call to fetchBlobID ---
+        # Make sure to set the correct RPC URL, contract address, and ABI above.
+        try:
+            # Call the fetchBlobID function on the smart contract
+            blob_id = patient_contract.functions.fetchBlobID(int(patientId)).call()
+            return jsonify({"blobId": blob_id}), 200
+        except Exception as e:
+            return jsonify({"error": f"Smart contract call failed: {str(e)}"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
