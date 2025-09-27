@@ -1,0 +1,134 @@
+.benefits-section {
+  background: transparent;
+  padding: 82px 42px 60px 42px;
+  text-align: center;
+}
+
+.benefits-section h2 {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 110%;
+  color: #000;
+  margin-bottom: 1rem;
+  max-width: 876px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.benefits-section p {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 3rem;
+  max-width: 610px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.benefits-cards {
+  display: flex;
+  gap: 42px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.benefit-card {
+  background: #FFF;
+  border-radius: 10px;
+  border: 1px solid #E6E6E6;
+  box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.25);
+  padding: 40px 32px;
+  width: 423px;
+  height: 375px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.benefit-icon {
+  margin-bottom: 22px;
+}
+
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  background: #DCFCE7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.benefit-card h3 {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 137%;
+  color: #000;
+  margin-bottom: 22px;
+  width: 272px;
+}
+
+.benefit-card p {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 324px;
+  margin: 0;
+}
+
+@media (max-width: 1400px) {
+  .benefits-cards {
+    gap: 30px;
+  }
+  
+  .benefit-card {
+    width: 350px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .benefits-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .benefits-section {
+    padding: 60px 20px;
+  }
+  
+  .benefits-section h2 {
+    font-size: 36px;
+  }
+  
+  .benefits-section p {
+    font-size: 20px;
+  }
+  
+  .benefit-card {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    padding: 30px 20px;
+  }
+  
+  .benefit-card h3 {
+    font-size: 20px;
+    width: 100%;
+  }
+  
+  .benefit-card p {
+    font-size: 16px;
+    width: 100%;
+  }
+}

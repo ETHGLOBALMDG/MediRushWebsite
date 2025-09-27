@@ -1,0 +1,425 @@
+.update-patient-record-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #EAFFF9 0%, #DBEAE6 100%);
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+.update-patient-record-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 203px;
+  position: relative;
+}
+
+.update-header {
+  text-align: center;
+  margin-top: 107px;
+  margin-bottom: 120px;
+}
+
+.update-title {
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 54px;
+  font-weight: 700;
+  line-height: 110%;
+  color: #000;
+  margin: 0 0 8px 0;
+}
+
+.update-subtitle {
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+.update-form-card {
+  width: 1034px;
+  background: #FFF;
+  border: 1px solid #9DEEA1;
+  border-radius: 25px;
+  box-shadow: 0 4px 10px 2px rgba(0, 0, 0, 0.25);
+  padding: 55px 64px 49px 64px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.patient-info-header {
+  display: flex;
+  flex-direction: row;
+  /* justify-content: center; */
+  align-items: center;
+  gap: 27px;
+  margin-bottom: 75px;
+}
+
+.patient-avatar {
+  width: 100px;
+  height: 100px;
+  /* flex-shrink: 0; */
+}
+
+.patient-details {
+  /* flex: 1; */
+  height:100px;
+}
+
+.patient-name {
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 110%;
+  color: #000;
+  margin: 0 0 5px 0;
+}
+
+.patient-id {
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0;
+}
+
+.form-section {
+  margin-bottom: 80px;
+}
+
+.form-label {
+  display: block;
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  color: #000;
+  margin-bottom: 11px;
+}
+
+.form-input {
+  width: 909px;
+  height: 88px;
+  border: 2px solid #D9D9D9;
+  border-radius: 19px;
+  background: #FFF;
+  padding: 0 39px;
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  color: #000;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #4CAF50;
+}
+
+.form-input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+}
+
+.form-textarea {
+  width: 909px;
+  border: 2px solid #D9D9D9;
+  border-radius: 19px;
+  background: #FFF;
+  padding: 27px 39px;
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  color: #000;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+  min-height: 208px;
+}
+
+.prescription-textarea {
+  min-height: 200px;
+}
+
+.form-textarea:focus {
+  border-color: #4CAF50;
+}
+
+.form-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+}
+
+.form-divider {
+  width: 909px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  margin: 45px 0 61px 0;
+}
+
+.approval-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.approval-info {
+  display: flex;
+  align-items: center;
+  gap: 51px;
+  flex: 1;
+}
+
+.approval-icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.approval-content {
+  flex: 1;
+}
+
+.approval-title {
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 137%;
+  color: #000;
+  margin: 0 0 4px 0;
+}
+
+.approval-description {
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 137%;
+  color: #000;
+  margin: 0;
+  max-width: 527px;
+}
+
+.submit-button {
+  width: 245px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid #4CAF50;
+  border-radius: 15px;
+  color: #006B04;
+  font-family: 'DM Sans', -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 137%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.submit-button:hover {
+  background: #4CAF50;
+  color: #FFF;
+}
+
+/* Responsive Design */
+@media (max-width: 1440px) {
+  .update-patient-record-container {
+    padding: 0 100px;
+  }
+  
+  .update-form-card {
+    width: 100%;
+    max-width: 1034px;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .form-divider {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .update-patient-record-container {
+    padding: 0 40px;
+  }
+  
+  .update-form-card {
+    padding: 40px 30px;
+  }
+  
+  .update-title {
+    font-size: 48px;
+  }
+  
+  .update-subtitle {
+    font-size: 24px;
+  }
+  
+  .approval-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .submit-button {
+    align-self: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .update-header {
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+  
+  .update-title {
+    font-size: 36px;
+  }
+  
+  .update-subtitle {
+    font-size: 20px;
+  }
+  
+  .update-form-card {
+    padding: 30px 20px;
+  }
+  
+  .patient-info-header {
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+  
+  .patient-name {
+    font-size: 28px;
+  }
+  
+  .patient-id {
+    font-size: 18px;
+  }
+  
+  .form-section {
+    margin-bottom: 40px;
+  }
+  
+  .form-label {
+    font-size: 20px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    font-size: 20px;
+    padding: 20px;
+  }
+  
+  .form-input {
+    height: 70px;
+  }
+  
+  .form-textarea,
+  .prescription-textarea {
+    min-height: 150px;
+  }
+  
+  .approval-info {
+    gap: 30px;
+  }
+  
+  .approval-title {
+    font-size: 20px;
+  }
+  
+  .approval-description {
+    font-size: 18px;
+  }
+  
+  .submit-button {
+    width: 200px;
+    height: 45px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .update-patient-record-container {
+    padding: 0 20px;
+  }
+  
+  .patient-info-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .approval-info {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .approval-description {
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .update-title {
+    font-size: 28px;
+  }
+  
+  .update-subtitle {
+    font-size: 18px;
+  }
+  
+  .patient-name {
+    font-size: 24px;
+  }
+  
+  .patient-id {
+    font-size: 16px;
+  }
+  
+  .form-label {
+    font-size: 18px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    font-size: 18px;
+    padding: 15px;
+  }
+  
+  .form-input {
+    height: 60px;
+  }
+  
+  .approval-title {
+    font-size: 18px;
+  }
+  
+  .approval-description {
+    font-size: 16px;
+  }
+  
+  .submit-button {
+    width: 180px;
+    height: 40px;
+    font-size: 16px;
+  }
+}

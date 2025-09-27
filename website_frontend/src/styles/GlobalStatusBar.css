@@ -1,0 +1,28 @@
+.global-status-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.5rem 2rem;
+  background: #f6fffa;
+  font-size: 1rem;
+}
+.status-label {
+  font-weight: 600;
+  color: #222;
+}
+.status-label.not-registered {
+  color: #888;
+}
+.status-label.doctor {
+  color: #27aeef;
+}
+.status-label.patient {
+  color: #2ecc71;
+}
+.wallet-label.connected {
+  color: #2ecc71;
+}
+.wallet-label.not-connected {
+  color: #888;
+}

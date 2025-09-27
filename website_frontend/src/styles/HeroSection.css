@@ -1,0 +1,132 @@
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F7FEF9;
+  padding: 118px 42px 60px 42px;
+  min-height: 558px;
+  position: relative;
+}
+
+.hero-content {
+  max-width: 777px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.hero-content h1 {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 110%;
+  color: #000;
+  margin-bottom: 1.5rem;
+}
+
+.secure {
+  color: #4CAF50;
+}
+
+.transparent {
+  color: #4CAF50;
+}
+
+.hero-content p {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.5);
+  margin-bottom: 2rem;
+  max-width: 676px;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+.get-started-btn {
+  background: #4CAF50;
+  color: #FFF;
+  border: none;
+  border-radius: 15px;
+  padding: 16px 32px;
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 280px;
+  height: 59px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.get-started-btn:hover {
+  background: #45a049;
+}
+
+.hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hero-image img {
+  width: 584px;
+  height: 472px;
+  object-fit: contain;
+}
+
+@media (max-width: 1200px) {
+  .hero-section {
+    flex-direction: column;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  
+  .hero-content {
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .hero-content h1 {
+    font-size: 36px;
+  }
+  
+  .hero-content p {
+    font-size: 20px;
+  }
+  
+  .hero-image img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+  }
+  
+  .hero-content h1 {
+    font-size: 28px;
+  }
+  
+  .hero-content p {
+    font-size: 18px;
+  }
+  
+  .get-started-btn {
+    font-size: 20px;
+    width: 170px;
+    height: 50px;
+  }
+}

@@ -1,0 +1,173 @@
+.steps-section {
+  background: transparent;
+  padding: 51px 42px 60px 42px;
+  text-align: center;
+  position: relative;
+}
+
+.steps-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 42px;
+  right: 42px;
+  height: 482px;
+  background: #FFF;
+  border-radius: 10px;
+  z-index: 0;
+}
+
+.steps-header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 3rem;
+}
+
+.steps-section h2 {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 110%;
+  color: #000;
+  margin-bottom: 1rem;
+  max-width: 923px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.steps-section p {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.5);
+  max-width: 610px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.steps-numbers {
+  display: flex;
+  justify-content: center;
+  gap: 392px;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.step-number {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid #4CAF50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 110%;
+  color: #4CAF50;
+}
+
+.steps-cards {
+  display: flex;
+  gap: 150px;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-card {
+  width: 324px;
+  text-align: center;
+}
+
+.step-card h3 {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 137%;
+  color: #000;
+  margin-bottom: 0.75rem;
+}
+
+.step-card p {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 137%;
+  color: rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+@media (max-width: 1400px) {
+  .steps-numbers {
+    gap: 250px;
+  }
+  
+  .steps-cards {
+    gap: 100px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .steps-numbers {
+    gap: 150px;
+  }
+  
+  .steps-cards {
+    gap: 50px;
+  }
+  
+  .step-card {
+    width: 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  .steps-numbers {
+    flex-direction: column;
+    gap: 30px;
+    align-items: center;
+  }
+  
+  .steps-cards {
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+  }
+  
+  .step-card {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .steps-section {
+    padding: 40px 20px;
+  }
+  
+  .steps-section h2 {
+    font-size: 36px;
+  }
+  
+  .steps-section p {
+    font-size: 20px;
+  }
+  
+  .step-card h3 {
+    font-size: 20px;
+  }
+  
+  .step-card p {
+    font-size: 16px;
+  }
+  
+  .step-number {
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+  }
+}

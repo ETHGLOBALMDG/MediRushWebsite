@@ -1,0 +1,53 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  line-height: 1.5;
+  color: #000;
+  background: #FFF;
+  overflow-x: hidden;
+}
+
+.homepage {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #EAFFF9 0%, #DBEAE6 100%);
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.homepage-header {
+  background: linear-gradient(180deg, #EAFFF9 0%, #DBEAE6 100%);
+  position: relative;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.main-bg {
+  background: linear-gradient(180deg, #EAFFF9 0%, #DBEAE6 100%);
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
