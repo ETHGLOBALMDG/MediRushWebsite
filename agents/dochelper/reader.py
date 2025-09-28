@@ -231,7 +231,7 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
 
     session_id = str(ctx.session)
 
-    if user_history_context[session_id] 
+    
     
     for item in msg.content:
         if isinstance(item, StartSessionContent):
@@ -243,8 +243,21 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         elif isinstance(item, TextContent):
             user_query = item.text.strip()
             ctx.logger.info(f"Processing query from {sender}")
+
+            if user_history_context.get(session_id, None) is None:
+                if user_query.startswith("**PATIENT_DATA**"):
+                    user_history_context[session_id] = user_query
+                else:
+                    await ctx.send(
+                        sender,
+                        create_text_chat("Please upload patient json data string")
+                    )
+                    return
+
             
             try:
+                user_history_str = user_history_context[session_id]
+
                 classification = classify_query(user_query, ["history"])
                 print(classification)
                 if classification["classification"] == "technical":
