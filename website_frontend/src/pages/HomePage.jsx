@@ -1,11 +1,10 @@
-import { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
 import BenefitsSection from '../components/BenefitsSection';
 import StepsSection from '../components/StepsSection';
 import GlobalStatusBar from '../components/GlobalStatusBar';
 import '../styles/App.css';
-import { useState, useEffect } from 'react';
+import { useState,useEffect} from 'react';
 import LoadingPage_1 from './loadingpage_1';
 
 const HomePage = () =>{ 

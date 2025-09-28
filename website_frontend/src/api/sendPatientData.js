@@ -4,15 +4,16 @@ import axios from 'axios';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 /**
- * Sends the proof to the backend API.
- * @param {object} proof - The proof object to send.
+ * Sends the patient encrypted data to the backend API.
+ * @param {object} data - The data object to send.
  * @returns {Promise<object>} - The backend response.
  */
-export const sendPatientProof = async (proof) => {
-  try {
-    const response = await axios.post(`${BACKEND_URL}/patient-proof`, proof, {
+export const sendPatientData = async (data) => {
+  try{
+
+    const response = await axios.post(`${BACKEND_URL}/api/patients/register`, data, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
@@ -22,7 +23,7 @@ export const sendPatientProof = async (proof) => {
     } else if (error.request) {
       throw new Error('Could not connect to backend.');
     } else {
-      throw new Error('Unexpected error while sending proof.');
+      throw new Error('Unexpected error while sending data.');
     }
   }
 };

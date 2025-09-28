@@ -157,7 +157,6 @@ const PatientHistory = () => {
                         </svg>
                         <h3 className="card-title">Potential Diagnoses</h3>
                       </div>
-                    ))}
                   </div>
                 </div>
 
@@ -210,7 +209,7 @@ const PatientHistory = () => {
                     ))}
                   </div>
                 </div>
-              </div>
+              </div>)};
             </div>
           </div>
 

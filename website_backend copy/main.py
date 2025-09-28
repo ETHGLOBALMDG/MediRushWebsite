@@ -87,13 +87,8 @@ with open("DoctorContractABI.json") as f:
 with open("Patients.json") as f:  
     PATIENTS_CONTRACT_ABI = json.load(f)
 
-with open("PatientDetailsContract.json") as f:  
-    PATIENT_DETAILS_CONTRACT_ABI = json.load(f)
 
 PATIENTS_CONTRACT_ADDRESS = "0x7b52C2a7075fc8F7DF4AEAd4f8d8277A8e35838F"
-
-PATIENT_DETAILS_CONTRACT_ADDRESS=Web3.to_checksum_address("0xb336f276bd3c380c5183a0a2f21e631e4a333d00")
-
 
 WEB3_PROVIDER = "https://testnet.hashio.io/api"  
 PRIVATE_KEY = os.environ.get("PRIVATE_KEY")      
@@ -102,7 +97,7 @@ w3 = Web3(Web3.HTTPProvider(WEB3_PROVIDER))
 contract = w3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
 patient_contract = w3.eth.contract(address=PATIENTS_CONTRACT_ADDRESS,abi=PATIENTS_CONTRACT_ABI)
-patient_details_contract=w3.eth.contract(address=PATIENT_DETAILS_CONTRACT_ADDRESS,abi=PATIENT_DETAILS_CONTRACT_ABI)
+
 OWNER_ADDRESS = w3.eth.account.from_key(PRIVATE_KEY).address
 
 @app.route('/api/doctors/uploadCertificate', methods=['POST'])
@@ -190,8 +185,8 @@ def register_doctor():
 
 @app.route('/api/patients/register', methods=['POST'])
 def register_patient():
-    encrypted_data = request.form.get("encryptedData","")   
-    patient_id=request.form.get("patient_id","")
+    encrypted_data = request.form.get("encryptedData")   
+    patient_id=request.form.get("patient_id")
     blob_id=client.put_blob(encrypted_data).get('url', "")
 
     print("Data:",encrypted_data)
@@ -199,7 +194,7 @@ def register_patient():
 
     # --- Hedera Smart Contract Transaction ---
     try:
-        txn = patient_details_contract.functions.addPatient(
+        txn = patient_contract.functions.addPatient(
             patient_id,
             blob_id
         ).build_transaction({

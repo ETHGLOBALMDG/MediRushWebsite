@@ -37,7 +37,7 @@ export const generateZkAgeProof = async (pdfFile, options = {}) => {
 
     // Construct the JSON body exactly as the server expects
     const proofBody = {
-      pdf_bytes: pdfBytes,
+      pdf_bytes: [0,1,2,3],
       page_number:0,
       offset:0,
       sub_string: options.subString || "LMV", 

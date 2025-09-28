@@ -99,15 +99,18 @@
 }
 
 .form-grid {
-  display: grid;
-  grid-template-columns: 417px 449px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 42px;
   margin-bottom: 32px;
+  margin-top: 32px;
   justify-content: center;
 }
 
 .form-group {
   display: flex;
+  margin-top:32px;
   flex-direction: column;
 }
 
@@ -171,7 +174,7 @@
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 32px;
   align-items: center;
   margin-top: 20px;
@@ -216,7 +219,7 @@
   cursor: pointer;
   transition: all 0.2s;
   height: 51px;
-  width: 309px;
+  width: auto;
 }
 
 .submit-btn:hover {
