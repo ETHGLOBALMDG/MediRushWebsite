@@ -115,16 +115,12 @@ Respond with ONLY ONE WORD - either "TECHNICAL" or "NON-TECHNICAL"
     return response.content.strip()
         
         
-def generate_non_technical_response(query: str, history: list) -> str:
+def generate_non_technical_response(query: str) -> str:
     """Generate response for non-technical queries using Gemini."""
     
-    history_context = format_chat_history(history)
     
     chat_prompt = f"""
 You are a helpful, friendly, and knowledgeable AI assistant. Respond to the user's query in a conversational and helpful manner.
-
-Context from previous conversation:
-{history_context}
 
 Current user query: "{query}"
 
@@ -182,14 +178,47 @@ Response Format:
 
 Example: symptoms|fever+cough+chest_pain
 """
-
     resp = llm.invoke(prompt)
+    intent = resp.split("|")[0]
+    keywords = resp.split("|")[1]
+
+    if intent == "symptoms":
+        anskw = rag.query_symptom(keywords)
+        if anskw == []:
+            return "Sorry, I don't know"
+    elif intent == "treatment":
+        anskw = rag.query_disease(keywords)
+        if anskw == []:
+            return "Sorry, I don't know"
+
+    elif intent == "side_effectts":
+        anskw = rag.query_treatment(keywords)
+        if anskw == []:
+            return "Sorry, I don't know"
+
+    else:
+        return "Sorry, I don't know"
+
+    prompt = f"""For the given intent, use these keywords to give some recommendation to the user. Only use the data i give, no other data.
+    if intent == symptoms, the keywords are names of possible diseases
+    if intent == treatment, the keywords are names of possible treatments
+    if intent == side_effects, the keywords are nams of possilble side effects of the treatment.
+    
+    The original query of the user for context is {query}.
+    The intent is {intent}.
+    The keywords are {anskw}
+
+    Return a user facing message.
+    """
+    resp = llm.invoke(prompt)
+    
     return resp.content.strip() # yahi pe pura response return krdio
 
 # Chat protocol setup
 chat_proto = Protocol(spec=chat_protocol_spec)
 
 user_history_context = {} # map of user id against string
+
 
 @chat_proto.on_message(ChatMessage)
 async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
@@ -201,6 +230,8 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
     )
 
     session_id = str(ctx.session)
+
+    if user_history_context[session_id] 
     
     for item in msg.content:
         if isinstance(item, StartSessionContent):
@@ -208,20 +239,21 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
             print(msg.content)
             await ctx.send(sender, create_text_chat("welcome_msg"))
             continue
-            
+        
         elif isinstance(item, TextContent):
             user_query = item.text.strip()
             ctx.logger.info(f"Processing query from {sender}")
             
             try:
-                classification = classify_query(user_query, history)
+                classification = classify_query(user_query, ["history"])
                 print(classification)
                 if classification["classification"] == "technical":
-                    bot_response = generate_technical_response(user_query, ["context"])
+                    user_query = user_history_str + user_query
+                    bot_response = generate_technical_response(user_query)
 
                 else:
                     # Use LLM for non-technical queries
-                    bot_response = generate_non_technical_response(user_query, ["context"])
+                    bot_response = generate_non_technical_response(user_query)
                 
                 # Add to chat history
                 add_to_chat_history(session_id, user_query, bot_response)

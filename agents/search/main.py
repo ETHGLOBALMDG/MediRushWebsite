@@ -1,17 +1,10 @@
 from uagents import Agent, Context, Model
 import json
-import math
+from langchain_google_genai import ChatGoogleGenerativeAI
 import dotenv
 import os
 
 dotenv.load_dotenv()
-
-class GeolocationRequest(Model):
-    address: str
-
-class GeolocationResponse(Model):
-    latitude: float
-    longitude: float
 
 class SortInput(Model):
     jsonstr: str
@@ -21,11 +14,20 @@ class DoctorRanking(Model):
     doctor_id: int
     name: str
     rating: int
-    distance_km: float
     final_score: float
 
 class SortResponse(Model):
     ranked_doctors: list[DoctorRanking]
+
+GEMINI_KEY = os.environ.get("GEMINI_KEY")
+
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash-lite",
+    google_api_key=GEMINI_KEY,
+    temperature=0.7
+)
+
 
 
 agent = Agent(
@@ -35,74 +37,40 @@ agent = Agent(
     mailbox=True,  # Replace with your actual mailbox key
     publish_agent_details=True
 )
-AI_AGENT_ADDRESS = "agent1qvnpu46exfw4jazkhwxdqpq48kcdg0u0ak3mz36yg93ej06xntklsxcwplc"
 
-async def get_user_location(ctx: Context, address):
-    resp = await ctx.send(AI_AGENT_ADDRESS, GeolocationRequest(address=address), response_type=GeolocationResponse, sync=True)
-    return (resp.latitude, resp.longitude) 
-
-def calculate_distance(lat1, lon1, lat2, lon2):
-    """
-    Calculate the great circle distance between two points 
-    on the earth (specified in decimal degrees) using Haversine formula
-    """
-    # Convert decimal degrees to radians
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+async def calculate_distance(addr1, addr2):
+    prompt = f"""Approximate the distance between the two addresses - addr1: {addr1} and addr2: {addr2}. Measure the straight line distance between the median points of both addresses. Based on this distance, return a value (score) from 0 to 50, for 0 being the farthest (100km) and 50 for being the closest. After 100km, give everyone 0 points.
+    Retun only the numerical score between 0 and 50, nothing else"""
     
-    # Haversine formula
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
-    c = 2 * math.asin(math.sqrt(a))
-    
-    # Radius of earth in kilometers
-    r = 6371
-    
-    return c * r
+    try:
+        return int(llm.invoke(prompt).content)
+    except:
+        return 25
 
-def calculate_distance_score(distance_km, max_distance=50):
-    """
-    Calculate distance score (higher score for shorter distance)
-    Score ranges from 0 to 100, with 100 being the closest
-    """
-    if distance_km >= max_distance:
-        return 0
-    return 100 * (1 - distance_km / max_distance)
-
-def calculate_final_score(rating, distance_score):
-    """
-    Calculate final score combining rating and distance
-    rating: 1-5 scale 
-    distance_score: 0-100 scale
-    """
-    return rating + distance_score
 
 @agent.on_message(model=SortInput, replies=SortResponse)
 async def sort_doctors_by_score(ctx: Context, sender: str, msg: SortInput):
     try:
-        # Parse the JSON string containing doctor data
         doctors_data = json.loads(msg.jsonstr)
+        user_addr = msg.userloc
         
         # Get user location coordinates
-        user_lat, user_lon = await get_user_location(ctx, msg.userloc)
         
         ranked_doctors = []
         
         for i, doctor in enumerate(doctors_data):
             # Extract doctor information
-            doc_lat = doctor.get('latitude')
-            doc_lon = doctor.get('longitude')
+            doc_addr = doctor.get('address')
             doc_rating = doctor.get('rating')
             doc_name = doctor.get('name', f'Doctor {i+1}') # fallback
             
             # Calculate distance
-            distance = calculate_distance(user_lat, user_lon, doc_lat, doc_lon)
+            distance = calculate_distance(doctors_data["address"], user_addr)
             
             # Calculate distance score
-            dist_score = calculate_distance_score(distance)
             
             # Calculate final score
-            final_score = calculate_final_score(doc_rating, dist_score)
+            final_score = doc_rating + distance - 25
             
             # Create ranking object
             doctor_ranking = DoctorRanking(
@@ -119,7 +87,6 @@ async def sort_doctors_by_score(ctx: Context, sender: str, msg: SortInput):
         ranked_doctors.sort(key=lambda x: x.final_score, reverse=True)
         
         # Log the results
-        ctx.logger.info(f"User location: ({user_lat}, {user_lon})")
         ctx.logger.info("Ranked doctors:")
         for i, doctor in enumerate(ranked_doctors[:5]):  # Show top 5
             ctx.logger.info(f"{i+1}. {doctor.name} - Score: {doctor.final_score} "
